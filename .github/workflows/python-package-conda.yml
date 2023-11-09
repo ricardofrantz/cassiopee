@@ -20,7 +20,7 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        conda activate base
+        activate base
         conda install python python-devtools setuptools=58.0.4 scons scipy sympy matplotlib
         conda install openmpi gcc gfortran
         conda env list
