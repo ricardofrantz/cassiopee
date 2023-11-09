@@ -1,7 +1,6 @@
 import sys
 import os
 
-
 os.system('tar -xovf fast.tar')
 
 #modules= ['KCore','Converter','Connector','CPlot','Dist2Walls','Distributor2','Generator','Geom','Initiator','Transform','Post','Envs','Compressor','RigidMotion']
@@ -20,4 +19,3 @@ pmodules= ['FastC','FastS','FastP','FastLBM','Fast']
 for module in pmodules:
    command0='cd PModules; gzip -d '+ module +'.tar.gz; tar -xovf ' + module +'.tar'
    os.system(command0)
-

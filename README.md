@@ -1,5 +1,6 @@
 # cassiopee
 
+This document provides instructions on how to install Cassiopee and its dependencies.
 
 ## Installing Intel OneAPI v2023+
 
@@ -74,9 +75,6 @@ sudo apt install -y build-essential python3-dev python3-numpy scons gfortran xor
 ```
 
 ## Installation cassiopee
-
-
- 
 
 source dnami setEnv.sh
 ```bash
