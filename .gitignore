@@ -2,3 +2,5 @@
 build
 3.6
 __pycache__
+buildInfo.py
+installPath.py

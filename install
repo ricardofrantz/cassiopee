@@ -1,65 +1,50 @@
-#! /bin/sh
-#
-# Installation de Compressor
-if ([ $# -eq 0 ])
-then
-    if [ "$CASSIOPEE" = "" ]; then
-        echo "You must specify a CASSIOPEE variable in your environment."
-        echo "This variable specifies the installation path of *Cassiopee*."
-        exit 1
+#!/bin/sh
+
+MODULES='KCore Mpi4py Converter Geom Transform Generator Post Initiator XCore Connector Distributor2 CPlot Dist2Walls RigidMotion Compressor Intersector'
+
+export OMP_NUM_THREADS=$(grep -c ^processor /proc/cpuinfo)
+echo "Number of processors (OMP_NUM_THREADS): $OMP_NUM_THREADS"
+
+# Function to compile a module
+compile_module() {
+    module=$1
+    should_clean_build=$2
+    cd "$CASSIOPEE/../$module"
+    echo "Compiling module: $PWD"
+
+    # Define the log file
+    log_file="$CASSIOPEE/../logs/${module}_compile.log"
+
+    if [ "$should_clean_build" = "clean" ] && [ -d "./build/" ]; then
+        echo "Removing existing build directory for $PWD/build/"
+        rm -rf ./build/
     fi
-    if [ "$ELSAPROD" = "" ]; then
-        export ELSAPROD=x86_r8
+
+    if [ ! -x install ]; then
+        echo "Changing permissions if install script for $module"
+        chmod +x install
     fi
-    INSTALLPATH="$CASSIOPEE/Dist/bin/$ELSAPROD"
 
-elif ([ $# -eq 1 ])
-then
-    INSTALLPATH="$1"
-else
-    echo 'install: install in $CASSIOPEE/Dist/bin/$ELSAPROD'
-    echo ' -or- '
-    echo 'install <dir>: install in directory <dir>.'
-    exit 1
-fi
+    # Redirect the output of the install script to the log file
+    ./install > "$log_file" 2>&1
+}
 
-# if specific python exe name
-if [ "$PYTHONEXE" != "" ]; then
-    alias python=$PYTHONEXE
-fi
+# Compile KCore first, which should fail before sourcing the environment
+compile_module "KCore" "clean"
 
-# set production mode (0: scons+setup, 1: scons+pip, 2: setup legacy)
-if [ "$PRODMODE" = "" ]; then
-    PRODMODE=0
-fi
+# Source the environment script for Cassiopee
+source $CASSIOPEE/Dist/env_Cassiopee.sh
 
-# Compilation et installation
-if [ $PRODMODE -le 1 ]; then
-    sconsf=`which scons`
-    if [ "$OMP_NUM_THREADS" != "" ]; then
-        export SCONSOPT="-j $OMP_NUM_THREADS"
-    else
-        export SCONSOPT=""
+# Compile the rest of the modules
+for module in $MODULES
+do
+    echo "Compiling module: $module"
+    if [ "$module" = "KCore" ]; then
+        # Compile KCore again after sourcing the environment
+        compile_module "KCore" "noclean"
+    else 
+        compile_module "$module" "clean"
     fi
-    python $sconsf install prefix="$INSTALLPATH" "$SCONSOPT"
-    [ $? != 0 ] && exit 1;
-    #touch Compressor/compressor.cpp
-    rm -f build/lib.*/Compressor/compressor.*
-    rm -f build/lib.*/Compressor/compressor-*.*
-    rm -f build/lib.*/Compressor/sz/csz.*
-    rm -f build/lib.*/Compressor/zfp/czfp.*
+done
 
-    if [ $PRODMODE -eq 0 ]; then
-        python setup.py install --prefix="$INSTALLPATH"
-        [ $? != 0 ] && exit 1;
-    elif [ $PRODMODE -eq 1 ]; then
-        python -m pip install --ignore-installed --upgrade --prefix="$INSTALLPATH" .
-        [ $? != 0 ] && exit 1;
-    fi
-else
-    python setupLegacy.py install --prefix="$INSTALLPATH"
-    [ $? != 0 ] && exit 1;
-fi
-
-# Test l'installation
-python test/t1.py
+chmod +x $CASSIOPEE/Dist/bin/x86_r8/lib/../cassiopee
