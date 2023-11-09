@@ -1,0 +1,14 @@
+LICENSE
+README
+setup.cfg
+setup.py
+./Initiator/Adim.py
+./Initiator/Initiator.py
+./Initiator/MeshSize.py
+./Initiator/PyTree.py
+./Initiator/__init__.py
+Initiator/initiator.cpp
+Initiator.egg-info/PKG-INFO
+Initiator.egg-info/SOURCES.txt
+Initiator.egg-info/dependency_links.txt
+Initiator.egg-info/top_level.txt

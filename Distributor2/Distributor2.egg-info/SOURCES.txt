@@ -1,0 +1,13 @@
+LICENSE
+README
+setup.cfg
+setup.py
+./Distributor2/Distributor2.py
+./Distributor2/Mpi.py
+./Distributor2/PyTree.py
+./Distributor2/__init__.py
+Distributor2/distributor2.cpp
+Distributor2.egg-info/PKG-INFO
+Distributor2.egg-info/SOURCES.txt
+Distributor2.egg-info/dependency_links.txt
+Distributor2.egg-info/top_level.txt

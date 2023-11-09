@@ -1,0 +1,12 @@
+LICENSE
+README
+setup.cfg
+setup.py
+./Dist2Walls/Dist2Walls.py
+./Dist2Walls/PyTree.py
+./Dist2Walls/__init__.py
+Dist2Walls/dist2walls.cpp
+Dist2Walls.egg-info/PKG-INFO
+Dist2Walls.egg-info/SOURCES.txt
+Dist2Walls.egg-info/dependency_links.txt
+Dist2Walls.egg-info/top_level.txt

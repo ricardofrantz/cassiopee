@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+./XCore/XCore.py
+./XCore/__init__.py
+XCore/xcore.cpp
+XCore.egg-info/PKG-INFO
+XCore.egg-info/SOURCES.txt
+XCore.egg-info/dependency_links.txt
+XCore.egg-info/top_level.txt

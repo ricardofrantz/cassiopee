@@ -1,0 +1,134 @@
+import distutils.sysconfig, os
+import KCore.Dist as Dist
+#==============================================================================
+# CPlot requires:
+# C++ compiler
+# Numpy
+# KCore
+# GL
+# optional: PNG, OSMesa
+#==============================================================================
+from KCore.config import *
+
+# If you want to use CPlot as a offscreen plotter (as on clusters)
+# set UseOSMesa to True (requires mesa)
+UseOSMesa = CPlotOffScreen
+
+# Get prefix from command line
+prefix = ARGUMENTS.get('prefix', '')
+installPath = Dist.getInstallPath(prefix)
+
+# Get compilers from Distutils ================================================
+(cc, cxx, opt, basecflags, ccshared, ldshared, so_ext) = Dist.getDistUtilsCompilers()
+
+# Python ======================================================================
+(pythonVersion, pythonIncDir, pythonLibDir, pythonLibs) = Dist.checkPython()
+
+# Test if numpy exists =======================================================
+(numpyVersion, numpyIncDir, numpyLibDir) = Dist.checkNumpy()
+
+# Test if kcore exists =======================================================
+(kcoreVersion, kcoreIncDir, kcoreLibDir) = Dist.checkKCore()
+
+libraries = ["GLU", "kcore", "Xi", "Xmu"]
+
+# Setting libraryDirs and libraries ===========================================
+libraryDirs = ['..', '.', pythonLibDir, kcoreLibDir, '/usr/X11R6/lib64']
+includeDirs = [pythonIncDir, numpyIncDir, kcoreIncDir, kcoreLibDir+'/../include']
+(ok, libs, paths) = Dist.checkCppLibs([], additionalLibPaths)
+libraryDirs += paths; libraries += libs
+
+# Test if OSMesa exists =======================================================
+if UseOSMesa:
+    (OSMesa, OSMesaIncDir, OSMesaLibDir, libname) = Dist.checkOSMesa(additionalLibPaths,
+                                                                     additionalIncludePaths)
+    if OSMesa:
+        libraries += [libname]
+        libraryDirs += [OSMesaLibDir]
+        includeDirs += [OSMesaIncDir]
+else: OSMesa = False
+
+if not UseOSMesa: libraries += ["GL"]
+
+# Test if PNG exists =========================================================
+(png, pngIncDir, pngLib) = Dist.checkPng(additionalLibPaths, 
+                                         additionalIncludePaths)
+if png:
+    libraries += ["png"]
+    libraryDirs += [pngLib]
+    includeDirs += [pngIncDir]
+
+# Test if MPEG exists =========================================================
+(mpeg, mpegIncDir, mpegLib) = Dist.checkMpeg(additionalLibPaths,
+                                             additionalIncludePaths)
+if mpeg:
+    libraries += ["avcodec"]
+    libraryDirs += [mpegLib]
+    includeDirs += [mpegIncDir]
+
+# Test if libmpi exists ======================================================
+(mpi, mpiIncDir, mpiLibDir, mpiLibs) = Dist.checkMpi(additionalLibPaths,
+                                                     additionalIncludePaths)
+
+if mpi:
+    libraryDirs.append(mpiLibDir)
+    includeDirs.append(mpiIncDir)
+
+import srcs
+if srcs.SHADERS == 2: 
+  includeDirs += ['CPlot/Shaders2.0']; print('INFO: using 2.0 shaders.')
+else: includeDirs += ['CPlot/Shaders']
+    
+# Env =========================================================================
+mySystem = Dist.getSystem()[0]
+if mySystem == 'mingw': tools = ['mingw']
+else: tools = None
+AR = Dist.getAR()
+env = Environment(tools=tools, CC=cc, CXX=cxx, AR=AR, CPPFLAGS=[], CCFLAGS=[],
+                  LIBPATH=additionalLibPaths+libraryDirs,
+                  LIBS=libraries+additionalLibs,
+                  CPPPATH=["CPlot"]+additionalIncludePaths+includeDirs,
+                  SHLIBSUFFIX=so_ext, SHLIBPREFIX='',
+                  LINKFLAGS=Dist.getLinkArgs(),
+                  ENV=Dist.getEnvForScons())
+env.Replace(CXXFLAGS=Dist.getCppArgs())
+env.Replace(CFLAGS=Dist.getCArgs())
+
+ELSAPROD = os.environ.get('ELSAPROD', 'x86_r8')
+env.SConsignFile('build/'+ELSAPROD+'/.sconsign.dblite')
+
+#==============================================================================
+import KCore.installPath
+EXTRA = ['-D__SHADERS__']
+
+if OSMesa: EXTRA += ['-D__MESA__'] 
+if OSMesa and ELSAPROD != 'spiro_r8' and ELSAPROD != 'x86_r8' and ELSAPROD != 'spiro_el8':
+    EXTRA += ['-DGLEW_OSMESA'] # pour que GLEW ne reference pas X11
+
+if mySystem == 'Darwin': EXTRA += ['-framework OpenGL']
+
+if mpi: EXTRA += ['-D_MPI']
+
+env.Append(CPPFLAGS=EXTRA)
+
+cplotLib = env.StaticLibrary('cplot', srcs.cpp_srcs)
+modDir = installPath+'/CPlot'
+
+dp1 = env.Install(modDir, cplotLib)
+dp3 = env.Install(modDir, 'ttk-themes/themes.tar')
+dp4 = env.Install(modDir, Glob('CPlot/Textures/*.png'))
+dp5 = env.Install(modDir, Glob('CPlot/Textures/*.ico'))
+
+if srcs.SHADERS == 2:
+    dp6 = env.Install(modDir, Glob('CPlot/Shaders2.0/*.frag'))
+    dp7 = env.Install(modDir, Glob('CPlot/Shaders2.0/*.vert'))
+    dp8 = env.Install(modDir, Glob('CPlot/Shaders2.0/*.geom'))
+    dp9 = env.Install(modDir, Glob('CPlot/Shaders2.0/*.tcs'))
+    dp10= env.Install(modDir, Glob('CPlot/Shaders2.0/*.tes'))
+else:
+    dp6 = env.Install(modDir, Glob('CPlot/Shaders/*.frag'))
+    dp7 = env.Install(modDir, Glob('CPlot/Shaders/*.vert'))
+    dp8 = env.Install(modDir, Glob('CPlot/Shaders/*.geom'))
+    dp9 = env.Install(modDir, Glob('CPlot/Shaders/*.tcs'))
+    dp10= env.Install(modDir, Glob('CPlot/Shaders/*.tes'))
+env.Alias(target="install", source=[dp1,dp3,dp4,dp5,dp6,dp7,dp8,dp9,dp10])

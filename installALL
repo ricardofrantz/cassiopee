@@ -1,0 +1,23 @@
+#! /bin/sh
+
+MODULES='Converter Geom Transform Generator Post Initiator XCore Connector Distributor2 CPlot Dist2Walls RigidMotion Compressor Intersector Mpi4py'
+
+# source $CASSIOPEE/Dist/env_Cassiopee.sh
+
+# compile tout
+cd KCore
+rm -r ./build/
+./install
+cd ..
+
+# source $CASSIOPEE/Dist/env_Cassiopee.sh
+
+
+for i in $MODULES
+do
+    cd $i
+    rm -r ./build/
+    ./install
+    cd ..
+done
+

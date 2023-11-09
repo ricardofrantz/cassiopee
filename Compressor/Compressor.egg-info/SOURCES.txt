@@ -1,0 +1,17 @@
+LICENSE
+README
+setup.cfg
+setup.py
+./Compressor/Compressor.py
+./Compressor/PyTree.py
+./Compressor/__init__.py
+./Compressor/sz/__init__.py
+./Compressor/sz/sz.py
+./Compressor/zfp/__init__.py
+Compressor/compressor.cpp
+Compressor.egg-info/PKG-INFO
+Compressor.egg-info/SOURCES.txt
+Compressor.egg-info/dependency_links.txt
+Compressor.egg-info/top_level.txt
+Compressor/sz/compressor.cpp
+Compressor/zfp/compressor.cpp

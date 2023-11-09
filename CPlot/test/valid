@@ -1,0 +1,19 @@
+#! /bin/sh
+if [ "$PYTHONEXE" != "" ]; then
+    alias python=$PYTHONEXE
+fi
+echo '======================================================================='
+echo '> Testing CPlot '
+echo '> date: '`date`
+if [ "$OMP_NUM_THREADS" = "" ]; then
+    echo '> threads: 1'
+else
+    echo '> threads: '$OMP_NUM_THREADS
+fi
+echo '======================================================================='
+rm -f *~
+for i in *_t*
+do
+        echo '=======================' $i '======================'
+        kpython $i
+done

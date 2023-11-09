@@ -1,0 +1,12 @@
+LICENSE
+README
+setup.cfg
+setup.py
+./RigidMotion/PyTree.py
+./RigidMotion/RigidMotion.py
+./RigidMotion/__init__.py
+RigidMotion/rigidMotion.cpp
+RigidMotion.egg-info/PKG-INFO
+RigidMotion.egg-info/SOURCES.txt
+RigidMotion.egg-info/dependency_links.txt
+RigidMotion.egg-info/top_level.txt
