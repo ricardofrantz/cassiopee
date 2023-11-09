@@ -64,3 +64,5 @@ do
 done
 
 chmod +x $CASSIOPEE/Dist/bin/x86_r8/lib/../cassiopee
+
+. $CASSIOPEE/Dist/env_Cassiopee.sh
