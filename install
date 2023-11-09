@@ -1,4 +1,8 @@
 #!/bin/sh
+# Script: install
+# Description: This script compiles a list of modules for the Cassiopee software package. It first cleans up the build environment, then pre-compiles the KCore module. After sourcing the environment script for Cassiopee, it compiles the rest of the modules. If a module's install script outputs 'FAILED' on its last line, that line is printed in red; otherwise, it is printed in green.
+# Usage: Run this script from the directory where it is located. It does not take any command-line arguments.
+# Author: Ricardo Frantz Nov-2023 DynFluid Lab Paris
 
 MODULES='KCore Mpi4py Converter Geom Transform Generator Post Initiator XCore Connector Distributor2 CPlot Dist2Walls RigidMotion Compressor Intersector'
 
@@ -24,25 +28,15 @@ compile_module() {
     # Redirect the output of the install script to the log file
     actual_log_file="../${module}.log"
     ./install >> "$actual_log_file" 2>&1
-    install_status=$?
-
-    if [ $install_status -ne 0 ] && [ "$should_clean_build" != "clean" ]; then
-        echo "Installation failed."
-        tail -20 "$actual_log_file" | awk '{print "\033[31m" $0 "\033[39m"}'
-        exit 1
-    # elif [ $install_status -ne 0 ] && [ "$should_clean_build" = "clean" ]; then
-    #     tail -2 "$actual_log_file" | awk '{print "\033[31m" $0 "\033[39m"}'
-    else
-        tail -1 "$actual_log_file" | awk '{print "\033[32m" $0 "\033[39m"}'
-    fi
+    tail -1 "$actual_log_file" | awk '/FAILED/ {print "\033[31m" $0 "\033[39m"; next} {print "\033[32m" $0 "\033[39m"}'
 }
 
 # Clean up the build environment
-echo "Cleaning up the build environment"
+echo "Cleaning up the build environment..."
 ./clean
 
 # Compile KCore first, which should fail before sourcing the environment
-echo "Pre-compiling module KCore"
+echo "Pre-compiling module KCore:"
 compile_module "KCore" "clean"
 
 # Source the environment script for Cassiopee
@@ -54,7 +48,7 @@ current_module=1
 
 for module in $MODULES
 do
-    echo "Compiling module $current_module of $total_modules in $module.log"
+    echo "Compiling module $current_module/$total_modules >> $module.log"
     if [ "$module" = "KCore" ]; then
         # Compile KCore again after sourcing the environment
         compile_module "KCore" "noclean"
