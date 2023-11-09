@@ -10,7 +10,6 @@ compile_module() {
     module=$1
     should_clean_build=$2
     cd "$CASSIOPEE/../$module"
-    #echo "Compiling: $PWD"
 
     if [ "$should_clean_build" = "clean" ] && [ -d "./build/" ]; then
         echo "Removing existing build directory for $PWD/build/"
@@ -23,18 +22,31 @@ compile_module() {
     fi
 
     # Redirect the output of the install script to the log file
-    log_file="${module}.log"
-    echo " tail -f $log_file"
-    # Define the log file
-    ./install > "../$log_file" 2>&1
+    actual_log_file="../${module}.log"
+    ./install >> "$actual_log_file" 2>&1
+    install_status=$?
+
+    if [ $install_status -ne 0 ] && [ "$should_clean_build" != "clean" ]; then
+        echo "Installation failed."
+        tail -20 "$actual_log_file" | awk '{print "\033[31m" $0 "\033[39m"}'
+        exit 1
+    # elif [ $install_status -ne 0 ] && [ "$should_clean_build" = "clean" ]; then
+    #     tail -2 "$actual_log_file" | awk '{print "\033[31m" $0 "\033[39m"}'
+    else
+        tail -1 "$actual_log_file" | awk '{print "\033[32m" $0 "\033[39m"}'
+    fi
 }
+
+# Clean up the build environment
+echo "Cleaning up the build environment"
+./clean
 
 # Compile KCore first, which should fail before sourcing the environment
 echo "Pre-compiling module KCore"
 compile_module "KCore" "clean"
 
 # Source the environment script for Cassiopee
-source $CASSIOPEE/Dist/env_Cassiopee.sh
+. $CASSIOPEE/Dist/env_Cassiopee.sh
 
 # Compile the rest of the modules
 total_modules=$(echo $MODULES | wc -w)
@@ -42,7 +54,7 @@ current_module=1
 
 for module in $MODULES
 do
-    echo "Compiling module $current_module of $total_modules: $module"
+    echo "Compiling module $current_module of $total_modules in $module.log"
     if [ "$module" = "KCore" ]; then
         # Compile KCore again after sourcing the environment
         compile_module "KCore" "noclean"

@@ -2,7 +2,7 @@ import os
 import sys
 
 # Get the path from an environment variable
-cassiopee_path = os.getenv('cassiopee_src_path')
+cassiopee_path = os.getenv('CASSIOPEE_SOURCE_ROOT')
 
 if cassiopee_path is not None:
     # Add the path to sys.path
