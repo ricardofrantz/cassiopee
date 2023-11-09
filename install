@@ -10,7 +10,7 @@ compile_module() {
     module=$1
     should_clean_build=$2
     cd "$CASSIOPEE/../$module"
-    echo "Compiling module: $PWD"
+    echo "Compiling: $PWD"
 
     if [ "$should_clean_build" = "clean" ] && [ -d "./build/" ]; then
         echo "Removing existing build directory for $PWD/build/"
@@ -24,7 +24,7 @@ compile_module() {
 
     # Redirect the output of the install script to the log file
     log_file="${module}.log"
-    echo "tail -f $log_file"
+    echo " tail -f $log_file"
     # Define the log file
     ./install > "../$log_file" 2>&1
 }
@@ -38,7 +38,6 @@ source $CASSIOPEE/Dist/env_Cassiopee.sh
 # Compile the rest of the modules
 for module in $MODULES
 do
-    echo "Compiling module: $module"
     if [ "$module" = "KCore" ]; then
         # Compile KCore again after sourcing the environment
         compile_module "KCore" "noclean"
