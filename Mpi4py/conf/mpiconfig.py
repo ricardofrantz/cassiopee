@@ -66,7 +66,7 @@ class Config(object):
         if log is None: log = self.log
         mpicc   = self.compiler_info.get('mpicc')
         mpicxx  = self.compiler_info.get('mpicxx')
-        mpifort = self.compiler_info.get('mpifort')
+        # mpifort = self.compiler_info.get('mpifort')
         mpif90  = self.compiler_info.get('mpif90')
         mpif77  = self.compiler_info.get('mpif77')
         mpild   = self.compiler_info.get('mpild')
@@ -74,8 +74,8 @@ class Config(object):
             log.info("MPI C compiler:    %s", mpicc)
         if mpicxx:
             log.info("MPI C++ compiler:  %s", mpicxx)
-        if mpifort:
-            log.info("MPI F compiler:    %s", mpifort)
+        # if mpifort:
+        #     log.info("MPI F compiler:    %s", mpifort)
         if mpif90:
             log.info("MPI F90 compiler:  %s", mpif90)
         if mpif77:

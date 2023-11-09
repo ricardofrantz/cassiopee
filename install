@@ -35,6 +35,10 @@ compile_module() {
 echo "Cleaning up the build environment..."
 ./clean
 
+for compiler in mpicc mpicxx mpif90 mpif77; do
+    echo "$(which $compiler)"
+done
+
 # Compile KCore first, which should fail before sourcing the environment
 echo "Pre-compiling module KCore:"
 compile_module "KCore" "clean"

@@ -5,3 +5,4 @@ __pycache__
 buildInfo.py
 installPath.py
 *.log
+Mpi4py/src/mpi4py.egg-info/PKG-INFO

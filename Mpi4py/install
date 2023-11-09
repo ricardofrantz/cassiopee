@@ -33,3 +33,4 @@ python3 setup.py install --prefix="$INSTALLPATH"
 
 # Test installation
 # kpython -n 2 -t 1 test/t1.py
+echo "Mpi4py correctly installed."
