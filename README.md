@@ -80,6 +80,6 @@ source dnami setEnv.sh
 ```bash
 git clone https://github.com/ricardofrantz/cassiopee.git
 cd cassiopee
-chmod +x installALL
-./installALL
+chmod +x install
+./install
 ```
