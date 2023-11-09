@@ -1,2 +1,4 @@
 .DS_Store
 build
+3.6
+__pycache__

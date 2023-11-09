@@ -364,7 +364,7 @@ def writeSetupCfg():
     if Cppcompiler == "None" or Cppcompiler == "":
         a = os.access("./setup.cfg", os.F_OK)
         if a: os.remove("./setup.cfg")
-    elif Cppcompiler.find("icpc") == 0 or Cppcompiler.find("icpx") == 0 or Cppcompiler.find("icc") == 0 or Cppcompiler.find("icx") == 0:
+    elif Cppcompiler.find('icc') == 0 or Cppcompiler.find('icpc') == 0 or Cppcompiler.find('icx') == 0:
         p = open("./setup.cfg", 'w')
         p.write('[build_ext]\ncompiler=intel\n')
         p.close()
@@ -411,10 +411,6 @@ def getDistUtilsCompilers():
             vars[0] = Cppcompiler.replace('icpc', 'icc'); vars[1] = Cppcompiler
         elif Cppcompiler.find('icc') != -1:
             vars[0] = Cppcompiler; vars[1] = Cppcompiler.replace('icc', 'icpc')
-        elif Cppcompiler.find('icpx') != -1:
-            vars[0] = Cppcompiler.replace('icpx', 'icx'); vars[1] = Cppcompiler
-        elif Cppcompiler.find('icx') != -1:
-            vars[0] = Cppcompiler; vars[1] = Cppcompiler.replace('icx', 'icpx')
 
     (cc, cxx, opt, basecflags, ccshared, ldshared, so_ext) = vars
     cc = cc.split(' ') # enleve les options si mises dans cc
@@ -556,7 +552,7 @@ def getSimdOptions():
         if i[0:6] == '-DSIMD':
             simd = i[7:]; break
     opts = []
-    if Cppcompiler.find("icpc") == 0 or Cppcompiler.find("icpx") == 0 or Cppcompiler.find("icc") == 0 or Cppcompiler.find("icx") == 0:
+    if Cppcompiler.find("icpc") == 0 or Cppcompiler.find("icc") == 0 or Cppcompiler.find("icx") == 0:
         if   simd == 'SSE4.2'  : opts += ['-xSSE4.2']
         elif simd == 'AVX2'    : opts += ['-xCORE-AVX2']
         elif simd == 'AVX512'  : opts += ['-xCORE-AVX512']
@@ -735,22 +731,13 @@ def getCArgs():
     options = getCppAdditionalOptions()[:]
     if EDOUBLEINT: options += ['-DE_DOUBLEINT']
     if GDOUBLEINT: options += ['-DG_DOUBLEINT']
-    if Cppcompiler.find("icpc") == 0 or Cppcompiler.find("icpx") == 0 or Cppcompiler.find("icc") == 0 or Cppcompiler.find("icx") == 0:
+    if Cppcompiler.find("icpc") == 0 or Cppcompiler.find("icc") == 0 or Cppcompiler.find("icx") == 0:
         v = getCppVersion() 
-        
-        if Cppcompiler.find("icpx") == 0 or Cppcompiler.find("icx") == 0:
-
-            if DEBUG:
-                options += ['-g', '-O0', '-diag-disable=47', '-diag-disable=1224']
-            else: options += ['-DNDEBUG', '-O2']#, '-wd47', '-wd1224']
-            
-        else:
-        
-            if DEBUG:
-                options += ['-g', '-O0', '-wd47', '-wd1224']
-                #options += ['-g', '-O0', '-wd47', '-wd1224', '-check-pointers=rw']
-            else: options += ['-DNDEBUG', '-O2', '-wd47', '-wd1224', '-diag-disable=10441']
-        
+        if DEBUG:
+            options += ['-g', '-O0', '-wd47', '-wd1224']
+            #options += ['-g', '-O0', '-wd47', '-wd1224', '-check-pointers=rw']
+        else: options += ['-DNDEBUG', '-O2', '-wd47', '-wd1224']
+         
         # hack pour intel 19
         if v[0] == 19: 
             for c, o in enumerate(options):
@@ -767,7 +754,6 @@ def getCArgs():
         else: options += ['-fPIC']
         options += getSimdOptions()
         return options
-    
     elif Cppcompiler.find("gcc") == 0 or Cppcompiler.find("g++") == 0:
         if DEBUG: 
            options += ['-g', '-O0', '-Wall', '-pedantic', '-D_GLIBCXX_DEBUG_PEDANTIC']
@@ -1579,7 +1565,7 @@ def checkParadigma(additionalLibPaths=[], additionalIncludePaths=[]):
 def checkBlas(additionalLibPaths=[], additionalIncludePaths=[]):
     try: from KCore.config import Cppcompiler
     except: from config import Cppcompiler
-    if Cppcompiler == 'icpc' or Cppcompiler == 'icpx' or Cppcompiler == 'icc' or Cppcompiler == 'icx':
+    if Cppcompiler == 'icc' or Cppcompiler == 'icpc' or Cppcompiler == 'icx': # intel - cherche dans MKL
         libPrefix = 'libmkl_'; includePrefix = 'mkl_'; compOpt = '-mkl'
     else: # cherche std
         libPrefix = 'lib'; includePrefix = ''; compOpt = ''
@@ -1620,7 +1606,7 @@ def checkBlas(additionalLibPaths=[], additionalIncludePaths=[]):
 def checkLapack(additionalLibPaths=[], additionalIncludePaths=[]):
     try: from KCore.config import Cppcompiler
     except: from config import Cppcompiler
-    if Cppcompiler == 'icpc' or Cppcompiler == 'icpx' or Cppcompiler == 'icc' or Cppcompiler == 'icx':
+    if Cppcompiler == 'icc' or Cppcompiler == 'icpc' or Cppcompiler == 'icx': # intel - cherche dans MKL
         libPrefix = 'libmkl_'; includePrefix = 'mkl_'; compOpt = '-mkl'
     else: # cherche std
         libPrefix = 'lib'; includePrefix = ''; compOpt = ''
@@ -1795,7 +1781,7 @@ def checkCppLibs(additionalLibs=[], additionalLibPaths=[], Cppcompiler=None,
             else: ret = False
 
     # icc (stdc++, guide ou iomp5)
-    if Cppcompiler.find("icpc") == 0 or Cppcompiler.find("icpx") == 0 or Cppcompiler.find("icc") == 0 or Cppcompiler.find("icx") == 0:
+    if Cppcompiler.find('icc') == 0 or Cppcompiler.find('icpc') == 0 or Cppcompiler.find('icx') == 0:
         l = checkLibFile__('libstdc++.so*', additionalLibPaths)
         if l is None:
             l = checkLibFile__('libstdc++.a', additionalLibPaths)
