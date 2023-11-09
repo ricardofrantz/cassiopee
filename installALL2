@@ -1,0 +1,45 @@
+#!/bin/sh
+
+MODULES='KCore Mpi4py Converter Geom Transform Generator Post Initiator XCore Connector Distributor2 CPlot Dist2Walls RigidMotion Compressor Intersector'
+
+export OMP_NUM_THREADS=$(grep -c ^processor /proc/cpuinfo)
+echo "Number of processors (OMP_NUM_THREADS): $OMP_NUM_THREADS"
+
+# Function to compile a module
+compile_module() {
+    module=$1
+    should_clean_build=$2
+    cd "$CASSIOPEE/../$module"
+    echo "Compiling module: $PWD"
+
+    if [ "$should_clean_build" = "clean" ] && [ -d "./build/" ]; then
+        echo "Removing existing build directory for $PWD/build/"
+        rm -rf ./build/
+    fi
+
+    if [ ! -x install ]; then
+        echo "Changing permissions if install script for $module"
+        chmod +x install
+    fi
+    ./install
+}
+
+# Compile KCore first, which should fail before sourcing the environment
+compile_module "KCore" "clean"
+
+# Source the environment script for Cassiopee
+source $CASSIOPEE/Dist/env_Cassiopee.sh
+
+# Compile the rest of the modules
+for module in $MODULES
+do
+    echo "Compiling module: $module"
+    if [ "$module" = "KCore" ]; then
+        # Compile KCore again after sourcing the environment
+        compile_module "KCore" "noclean"
+    else 
+        compile_module "$module" "clean"
+    fi
+done
+
+chmod +x $CASSIOPEE/Dist/bin/x86_r8/lib/../cassiopee
