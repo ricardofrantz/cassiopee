@@ -35,8 +35,9 @@ compile_module() {
 echo "Cleaning up the build environment..."
 ./clean
 
+echo "Checking all compilers:"
 for compiler in mpicc mpicxx mpif90 mpif77; do
-    echo "$(which $compiler)"
+    echo " $(which $compiler)"
 done
 
 # Compile KCore first, which should fail before sourcing the environment

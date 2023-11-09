@@ -118,10 +118,10 @@ First, you need to set up some environment variables. Add the following lines to
 
 ```bash
 # This is the directory where the Cassiopee source code will be stored
-export cassiopee_src_path=$HOME/cassiopee
+export CASSIOPEE_SOURCE_ROOT="$HOME/cassiopee"
 
 # This is the directory where Cassiopee will be installed
-export CASSIOPEE=$HOME/cassiopee/3.6
+export CASSIOPEE=$CASSIOPEE_SOURCE_ROOT/3.6
 
 # Also add an alias
 alias c='cassiopee'
