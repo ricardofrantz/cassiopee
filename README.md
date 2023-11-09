@@ -59,7 +59,7 @@ conda create --name dnami
 conda activate dnami 
 
 # Install the necessary packages in the 'dnami' environment
-conda install python python-devtools setuptools=58.0.4 scons scipy sympy matplotlib
+conda install python python-devtools setuptools=58.0.4 scons scipy sympy matplotlib slepc4py # mpi4py
 
 # Ensure the 'dnami' environment is activated
 conda activate dnami
@@ -86,7 +86,7 @@ sudo apt -y autoremove
 # libhdf5-dev: contains the header files and static libraries for developing programs that will use Hierarchical Data Format 5 (HDF5).
 # libglfw3-dev: is the development files for GLFW 3 library, which is a free, open source, multi-platform library for creating windows with OpenGL contexts.
 # libgl1-mesa-dev, libglu1-mesa-dev: are the development files for the Mesa 3D graphics library.
-sudo apt install -y build-essential python3-dev python3-numpy scons gfortran xorg-dev libhdf5-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
+sudo apt install -y build-essential python3-dev python3-numpy scons gfortran xorg-dev libhdf5-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev default-jdk bison
 ```
 
 ## Installation on macOS
@@ -139,7 +139,7 @@ Next, you need to clone the Cassiopee repository and navigate into it:
 
 ```bash
 # Clone the Cassiopee repository
-git clone https://github.com/ricardofrantz/cassiopee.git
+git clone --depth 1 https://github.com/ricardofrantz/cassiopee.git
 
 # Navigate into the cassiopee directory
 cd cassiopee
@@ -158,4 +158,13 @@ Once Cassiopee is installed, you can run it directly from the terminal:
 
 ```bash
 cassiopee
+```
+
+## Installing tapenade
+```bash
+git clone --depth 1 https://gitlab.inria.fr/tapenade/tapenade.git
+cd tapenade
+javac -version
+./gradlew clean
+./gradlew
 ```
