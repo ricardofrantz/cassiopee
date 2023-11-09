@@ -12,21 +12,21 @@ compile_module() {
     cd "$CASSIOPEE/../$module"
     echo "Compiling module: $PWD"
 
-    # Define the log file
-    log_file="$CASSIOPEE/../logs/${module}_compile.log"
-
     if [ "$should_clean_build" = "clean" ] && [ -d "./build/" ]; then
         echo "Removing existing build directory for $PWD/build/"
         rm -rf ./build/
     fi
 
     if [ ! -x install ]; then
-        echo "Changing permissions if install script for $module"
+        echo "Changing permissions of install script for $module"
         chmod +x install
     fi
 
     # Redirect the output of the install script to the log file
-    ./install > "$log_file" 2>&1
+    log_file="${module}.log"
+    echo "tail -f $log_file"
+    # Define the log file
+    ./install > "../$log_file" 2>&1
 }
 
 # Compile KCore first, which should fail before sourcing the environment
