@@ -148,3 +148,11 @@ javac -version
 ./gradlew clean
 ./gradlew
 ```
+
+## Installing fully automatic
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ricardofrantz/cassiopee/main/cassiopee.sh)"
+```
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ricardofrantz/cassiopee/main/tapenade.sh)"
+```
