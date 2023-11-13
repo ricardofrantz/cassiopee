@@ -44,6 +44,7 @@ Please note that, as of now, we need to use setuptools up to version 58.0.4 due 
 Here are the steps to set up the environment to deactivate any currently active environment, remove the 'dnami' environment if it exists, create a new conda environment and activate it. 
 
 ```bash
+conda config --set auto_activate_base false
 conda deactivate
 conda remove --name dnami --all
 conda create --name dnami
