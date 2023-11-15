@@ -40,12 +40,20 @@ compile_module() {
     # Redirect the output of the install script to the log file
     actual_log_file="../${module}.log"
     ./install >> "$actual_log_file" 2>&1
+
+    grep -n 'Info: Mpi det' "$actual_log_file" | head -n 1
+    grep -n 'Info: Mpi4py' "$actual_log_file" | head -n 1
+    grep -n 'Info: png' "$actual_log_file" | head -n 1
+    grep -n 'Info: Hdf5' "$actual_log_file" | head -n 1
     tail -1 "$actual_log_file" | awk '/FAILED/ {print "\033[31m" $0 "\033[39m"; next} {print "\033[32m" $0 "\033[39m"}'
 }
 
-# Clean up the build environment
-echo "Cleaning up the build environment..."
-./clean.sh
+# Check if --clean is passed as an argument
+if [[ $# -gt 0 && $1 == "--clean" ]]; then
+    # Clean up the build environment
+    echo "Cleaning up the build environment..."
+    ./clean.sh
+fi
 
 echo "Sourced compilers:"
 for compiler in mpicc mpicxx mpif90 mpif77; do
@@ -54,7 +62,7 @@ done
 
 # Compile KCore first, which should fail before sourcing the environment
 echo "Pre-compiling module KCore:"
-compile_module "KCore" "clean"
+compile_module "KCore" "noclean"
 
 # Source the environment script for Cassiopee
 . $CASSIOPEE/Dist/env_Cassiopee.sh
@@ -67,10 +75,9 @@ for module in $MODULES
 do
     echo "Compiling module $current_module/$total_modules >> $module.log"
     if [ "$module" = "KCore" ]; then
-        # Compile KCore again after sourcing the environment
         compile_module "KCore" "noclean"
     else 
-        compile_module "$module" "clean"
+        compile_module "$module" "noclean"
     fi
     current_module=$((current_module+1))
 done

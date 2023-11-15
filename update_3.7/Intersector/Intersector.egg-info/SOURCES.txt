@@ -1,0 +1,13 @@
+README
+setup.cfg
+setup.py
+./Intersector/Intersector.py
+./Intersector/Mpi.py
+./Intersector/PyTree.py
+./Intersector/TurboMachine.py
+./Intersector/__init__.py
+Intersector/intersector.cpp
+Intersector.egg-info/PKG-INFO
+Intersector.egg-info/SOURCES.txt
+Intersector.egg-info/dependency_links.txt
+Intersector.egg-info/top_level.txt

@@ -1,0 +1,70 @@
+import distutils.sysconfig, os
+import KCore.Dist as Dist
+#==============================================================================
+# Compressor requires:
+# C++ compiler
+# Numpy
+# KCore
+#==============================================================================
+
+# Get prefix from command line
+prefix = ARGUMENTS.get('prefix', '')
+installPath = Dist.getInstallPath(prefix)
+
+# Get compilers from Distutils ================================================
+(cc, cxx, opt, basecflags, ccshared, ldshared, so_ext) = Dist.getDistUtilsCompilers()
+
+# Python ======================================================================
+(pythonVersion, pythonIncDir, pythonLibDir, pythonLibs) = Dist.checkPython()
+
+# Test if numpy exists =======================================================
+(numpyVersion, numpyIncDir, numpyLibDir) = Dist.checkNumpy()
+
+# Test if kcore exists =======================================================
+(kcoreVersion, kcoreIncDir, kcoreLibDir) = Dist.checkKCore()
+
+# Setting libraryDirs and libraries ===========================================
+libraryDirs = [pythonLibDir, kcoreLibDir]
+libraries = ["kcore"]
+from KCore.config import *
+(ok, libs, paths) = Dist.checkCppLibs([], additionalLibPaths)
+libraryDirs += paths; libraries += libs
+
+ADDITIONALCFLAGS = ["-DZFP_INT64='long long'","-DZFP_INT64_SUFFIX='ll'","-DZFP_UINT64='unsigned long long'","-DZFP_UINT64_SUFFIX='ull'"]
+# Attention a renommer Compressor/zstd/common/bitstream.h en zstd_bitstream.h
+additionalIncludePaths += ["Compressor/zstd", "Compressor/zstd/common"]
+additionalIncludePaths += ["Compressor/sz/include"]
+additionalIncludePaths += ["Compressor/zfp/include"]
+
+# Env =========================================================================
+import srcs
+if Dist.getSystem()[0] == 'mingw': tools = ['mingw']
+else: tools = None
+AR = Dist.getAR()
+env = Environment(tools=tools, CC=cc, CXX=cxx, AR=AR, CPPFLAGS=[],
+                  LIBPATH=["Compressor"]+additionalLibPaths+libraryDirs,
+                  LIBS=libraries+additionalLibs,
+                  CPPPATH=additionalIncludePaths+[pythonIncDir, numpyIncDir, kcoreIncDir],
+                  CFLAGS=Dist.getCArgs()+['-std=c99']+ADDITIONALCFLAGS,
+                  CXXFLAGS=Dist.getCppArgs()+ADDITIONALCFLAGS,
+                  SHLIBSUFFIX=so_ext, SHLIBPREFIX='',
+                  LINKFLAGS=Dist.getLinkArgs(),
+                  ENV=Dist.getEnvForScons())
+
+ELSAPROD = os.environ.get('ELSAPROD', 'x86_r8')
+env.SConsignFile('build/'+ELSAPROD+'/.sconsign.dblite')
+
+#==============================================================================
+
+myMod = env.StaticLibrary('compressor', srcs.cpp_srcs)
+myMod2 = env.StaticLibrary('kzstd', srcs.zstd_srcs)
+myMod3 = env.StaticLibrary('ksz', srcs.sz_srcs)
+myMod4 = env.StaticLibrary('kzfp', srcs.zfp_srcs)
+
+modDir = 'build/'+ELSAPROD
+dp1 = env.Install(modDir, myMod)
+dp3 = env.Install(modDir, myMod2)
+dp4 = env.Install(modDir, myMod3)
+dp5 = env.Install(modDir, myMod4)
+
+env.Alias(target="install", source=[dp1,dp3,dp4,dp5])

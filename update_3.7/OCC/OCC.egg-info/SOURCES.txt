@@ -1,0 +1,15 @@
+LICENSE
+LICENSE_LGPL_21.txt
+README
+setup.cfg
+setup.py
+./OCC/OCC.py
+./OCC/PyTree.py
+./OCC/__init__.py
+./OCC/depend.py
+OCC/occ.cpp
+OCC.egg-info/PKG-INFO
+OCC.egg-info/SOURCES.txt
+OCC.egg-info/dependency_links.txt
+OCC.egg-info/top_level.txt
+test/testObject.py
