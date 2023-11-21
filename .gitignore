@@ -7,3 +7,4 @@ installPath.py
 *.log
 *.swp
 Mpi4py/src/mpi4py.egg-info/PKG-INFO
+setup.cfg
