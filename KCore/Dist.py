@@ -269,19 +269,19 @@ def writeEnvs():
     if elsaprod != '': p.write("export ELSAPROD=%s\n"%elsaprod)
     p.write("export OMP_NUM_THREADS=%d\n"%mt)
     p.write("export PATH=%s:%s/bin:$PATH\n"%(cmdPath,cmdPath))
-    p.write("if [ \"$PYTHONPATH\" = \"\" ]; then\n")
+    p.write("if [ -z \"${PYTHONPATH+x}\" ]; then\n")
     p.write("      export PYTHONPATH=%s\n"%installPathLocal)
     p.write("else\n")
     p.write("      export PYTHONPATH=%s:$PYTHONPATH\n"%installPathLocal)
     p.write("fi\n")
     if installLD is None:
-        p.write("if [ \"$LD_LIBRARY_PATH\" = \"\" ]; then\n")
+        p.write("if [ -z \"${LD_LIBRARY_PATH+x}\" ]; then\n")
         p.write("      export LD_LIBRARY_PATH=%s\n"%libPath)
         p.write("else\n")
         p.write("      export LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH\n"%libPath)
         p.write("fi\n")
     else:
-        p.write("if [ \"$LD_LIBRARY_PATH\" = \"\" ]; then\n")
+        p.write("if [ -z \"${LD_LIBRARY_PATH+x}\" ]; then\n") # Ricardo modification
         p.write("      export LD_LIBRARY_PATH=%s:%s\n"%(libPath,installLD))
         p.write("else\n")
         p.write("      export LD_LIBRARY_PATH=%s:%s:$LD_LIBRARY_PATH\n"%(libPath,installLD))
