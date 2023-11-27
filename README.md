@@ -49,7 +49,8 @@ conda deactivate
 conda remove --name dnami --all
 conda create --name dnami
 conda activate dnami 
-conda install setuptools=58.0 scons sympy scipy matplotlib # slepc4py libpng ffmpeg # python-devtools 
+conda install setuptools=58.0 scons sympy scipy matplotlib hdf5 openmpi openmpi-mpicc openmpi-mpicxx openmpi-mpifort # python-devtools
+# slepc4py av
 ```
 
 ## Installation on Ubuntu apt
