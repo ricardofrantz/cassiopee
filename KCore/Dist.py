@@ -1,3 +1,4 @@
+
 # Functions used in *Cassiopee* modules setup.py
 import os, sys, distutils.sysconfig, platform, glob, subprocess
 
@@ -25,7 +26,7 @@ def checkModuleImport(moduleName, raiseOnError=True):
 
     # sec / lock
     moduleBase = moduleName.split('.')[0]
-    os.chmod(moduleBase, 0o700)
+    #os.chmod(moduleBase, 0o700)
 
     # try import module
     try:
@@ -853,9 +854,9 @@ def getForArgs():
     f77compiler = compiler[l]
     if f77compiler == "None": return []
     options = getf77AdditionalOptions()
-    if f77compiler.find("gfortran") == 0:
-        if DEBUG: options += ['-g', '-O0']
-        else: options += ['-O3']
+    if f77compiler == "gfortran":
+        if DEBUG: options += ['-Wall', '-g', '-O0', '-fbacktrace', '-fbounds-check', '-ffpe-trap=zero,underflow,overflow,invalid']
+        else: options += ['-Wall', '-O3']
         if useOMP() == 1: options += ['-fopenmp']
         if useStatic() == 1: options += ['--static']
         else: options += ['-fPIC']
@@ -867,7 +868,7 @@ def getForArgs():
         return options
     elif f77compiler.find("ifort") == 0:
         if DEBUG:
-            options += ['-g', '-O0', '-CB', '-fpe0']
+            options += ['-g', '-O0', '-CB', '-traceback', '-fpe0']
         else: options += ['-O3']
         v = getForVersion()
         if v[0] < 15:
@@ -1272,13 +1273,13 @@ def checkOSMesa(additionalLibPaths=[], additionalIncludePaths=[]):
         print('Info: libOSmesa detected at %s.'%l)
         return (True, i, l, libname)
     elif l is None and i is not None:
-        print('Info: libOSMesa was not found on your system. No offscreen support for CPlot.')
+        print('Info: libOSMesa was not found on your system. No OSMESA offscreen support for CPlot.')
         return (False, i, l, libname)
     elif l is not None and i is None:
-        print('Info: GL/osmesa.h was not found on your system. No offscreen support for CPlot.')
+        print('Info: GL/osmesa.h was not found on your system. No OSMESA offscreen support for CPlot.')
         return (False, i, l, libname)
     else:
-        print('Info: libOSMesa or GL/osmesa.h was not found on your system. No offscreen support for CPlot.')
+        print('Info: libOSMesa or GL/osmesa.h was not found on your system. No OSMESA offscreen support for CPlot.')
         return (False, i, l, libname)
 
 #=============================================================================
@@ -1457,6 +1458,8 @@ def checkMpi(additionalLibPaths=[], additionalIncludePaths=[]):
 # Retourne: (True/False, chemin des includes, chemin de la librairie)
 #=============================================================================
 def checkMpi4py(additionalLibPaths=[], additionalIncludePaths=[]):
+    #print("INFO: dependance to MPI STUBED.")
+    #return (False, None, None, None)
     try: import mpi4py
     except:
         print('Info: mpi4py or mpi4py.MPI.h was not found on your system. No Mpi support.')
@@ -1779,6 +1782,10 @@ def checkCppLibs(additionalLibs=[], additionalLibPaths=[], Cppcompiler=None,
     if Cppcompiler.find('gcc') == 0 or Cppcompiler.find('g++') == 0:
         os.environ['CC'] = 'gcc' # forced in 2.6 to overide setup.cfg
         os.environ['CXX'] = 'g++'
+        from distutils import sysconfig
+        cflags = sysconfig.get_config_var('CFLAGS')
+        sysconfig._config_vars['CFLAGS'] = '' # kill setup flags for CC
+        sysconfig._config_vars['LDFLAGS'] = '' # kill setup flags for LD
         l = checkLibFile__('libstdc++.so*', additionalLibPaths)
         if l is None:
             l = checkLibFile__('libstdc++.a', additionalLibPaths)
@@ -1911,10 +1918,10 @@ def writeBuildInfo():
     else: dict['numpy'] = "None"
 
     # Check png
-    (png, pngIncDir, pngLib) = checkPng(config.additionalLibPaths,
-                                        config.additionalIncludePaths)
-    if png: dict['png'] = pngLib
-    else: dict['png'] = "None"
+    #(png, pngIncDir, pngLib) = checkPng(config.additionalLibPaths,
+    #                                    config.additionalIncludePaths)
+    #if png: dict['png'] = pngLib
+    #else: dict['png'] = "None"
 
     # Check ffmpeg
     (mpeg, mpegIncDir, mpegLib) = checkMpeg(config.additionalLibPaths,
@@ -1956,7 +1963,7 @@ def writeInstallBase(dict):
        raise SystemError("Error: can not open file installBase.py for writing.")
 
     # Write doc
-    p.write("# This is the dictionary keeping track of installation.\n# The key is the machine name or ELSAPROD name. For each key a list is stored.\n# [description, \n# f77compiler, libfortdir, libfort, f90compiler, libf90dir, libf90, \n# Cppcompiler, libCpp, useOMP, \n# CPlotOffScreen \n# pngPath, mpegPath, adfPath, hdfPath].\n# Path are list of strings. useOMP, CPlotOffScreen are booleans. \n# Others are strings.\n")
+    p.write("# This is the dictionary keeping track of installation.\n# The key is the machine name or ELSAPROD name. For each key a list is stored.\n# [description, \n# f77compiler, libfortdir, libfort, f90compiler, libf90dir, libf90, \n# Cppcompiler, libCpp, useOMP, \n# pngPath, mpegPath, adfPath, hdfPath].\n# Path are list of strings. useOMP, static are booleans. \n# Others are strings.\n")
 
     # Write dictionary
     #p.write("installDict = "+str(dict))
@@ -1983,12 +1990,11 @@ def writeInstallBase(dict):
             elif lc == 6: p.write("%s, # f77AdditionalOptions\n"%lstr)
             elif lc == 7: p.write("%s, # useOMP\n"%lstr)
             elif lc == 8: p.write("%s, # static\n"%lstr)
-            elif lc == 9: p.write("%s, # CPlotOffScreen\n"%lstr)
-            elif lc == 10: p.write("%s, # additionalIncludePaths\n"%lstr)
-            elif lc == 11: p.write("%s, # additionalLibs\n"%lstr)
-            elif lc == 12: p.write("%s, # additionalLibPaths\n"%lstr)
-            elif lc == 13: p.write("%s, # useCuda\n"%lstr)
-            elif lc == 14: p.write("%s  # NvccAdditionalOptions\n"%lstr)
+            elif lc == 9: p.write("%s, # additionalIncludePaths\n"%lstr)
+            elif lc == 10: p.write("%s, # additionalLibs\n"%lstr)
+            elif lc == 11: p.write("%s, # additionalLibPaths\n"%lstr)
+            elif lc == 12: p.write("%s, # useCuda\n"%lstr)
+            elif lc == 13: p.write("%s  # NvccAdditionalOptions\n"%lstr)
         kc += 1
         if kc == len(dict): p.write("]\n")
         else: p.write("], \n")

@@ -82,6 +82,9 @@ do
     current_module=$((current_module+1))
 done
 
-chmod +x $CASSIOPEE/Dist/bin/x86_r8/lib/../cassiopee
-
+echo "Done compiling modules."
+echo "Sourcing env_Cassiopee.sh..."
 . $CASSIOPEE/Dist/env_Cassiopee.sh
+
+echo "Setting permissions for executables..."
+chmod +x $CASSIOPEE/Dist/bin/x86_r8/lib/../cassiopee
