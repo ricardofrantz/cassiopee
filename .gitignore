@@ -8,3 +8,4 @@ installPath.py
 *.swp
 setup.cfg
 Mpi4py/src/mpi4py.egg-info
+Mpi4py/mpi4py.egg-info

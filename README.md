@@ -2,7 +2,7 @@
 
 This document provides instructions on how to install Cassiopee and its dependencies.
 
-## (Optional) Installing Intel OneAPI v2023+
+## (Optional) Installing Intel OneAPI v2024+ (not working yet)
 
 ```bash
 # Download the Intel GPG key and add it to your keyring
@@ -19,6 +19,17 @@ sudo apt update
 # Install the Intel OneAPI HPC Toolkit
 sudo apt install intel-hpckit
 ```
+
+## (Optional) Installing Intel OneAPI v2023.2 (latest before LLVM update)
+
+```bash
+sudo apt-get install intel-opencl-icd
+wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/992857b9-624c-45de-9701-f6445d845359/l_BaseKit_p_2023.2.0.49397_offline.sh
+sudo sh ./l_BaseKit_p_2023.2.0.49397_offline.sh
+wget https://registrationcenter-download.intel.com/akdlm/IRC_NAS/0722521a-34b5-4c41-af3f-d5d14e88248d/l_HPCKit_p_2023.2.0.49440_offline.sh
+sudo sh ./l_HPCKit_p_2023.2.0.49440_offline.sh
+```
+
 
 ## Installation conda
 
@@ -49,7 +60,7 @@ conda deactivate
 conda remove --name dnami --all
 conda create --name dnami
 conda activate dnami 
-conda install setuptools=58.0 scons sympy scipy matplotlib hdf5 openmpi openmpi-mpicc openmpi-mpicxx openmpi-mpifort # python-devtools
+conda install setuptools=58.0 scons sympy scipy matplotlib hdf5 openmpi openmpi-mpicc openmpi-mpicxx openmpi-mpifort cxx-compiler cython # python-devtools
 # slepc4py av
 ```
 
