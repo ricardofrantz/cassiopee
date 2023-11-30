@@ -15,21 +15,32 @@ lib_path = []
 active_conda_env = os.environ.get('CONDA_DEFAULT_ENV') # return conda env name
 active_conda_env_path = os.environ.get('CONDA_PREFIX') # return conda env path
 if active_conda_env is not None:
-    print('Detected active conda environment:')
+    print('Detected active conda environment:', active_conda_env)
     # output = subprocess.check_output("conda list", shell=True)
-    # print(output.decode())
     include_path.append('/usr/include/x86_64-linux-gnu')  # default include path
     lib_path.append('/usr/lib/x86_64-linux-gnu')  # default lib path
+
     include_path.append(os.path.join(active_conda_env_path, "include"))
     lib_path.append(os.path.join(active_conda_env_path, "lib"))
 else:
     print('No active conda environment') 
-    # custom include and lib paths #
+    #custom include and lib paths #
     include_path.append('/usr/include')  # default include path
+    include_path.append('/usr/include/x86_64-linux-gnu')  # default include path
     include_path.append('/usr/include/hdf5/serial') # hdf5 include path
-    include_path.append('/usr/lib/x86_64-linux-gnu/openmpi/include') # openmpi include path
     lib_path.append('/usr/lib/x86_64-linux-gnu')  # default lib path
     lib_path.append('/usr/lib/x86_64-linux-gnu/hdf5/serial') # hdf5 lib path
+
+# compiler_path = subprocess.getoutput(f'which mpiicc')
+# if 'no mpiicc in' not in compiler_path:
+#     mpi_path = os.path.dirname(compiler_path)
+#     mpi_path_components = mpi_path.split(os.sep)
+#     first_five_folders = os.sep.join(mpi_path_components[:6])
+#     include_path.append(first_five_folders + '/include')
+# else:
+#     include_path.append('/usr/include/mpi')  # default include path
+#     lib_path.append('/usr/include/mpi')  # default include path
+
 
 ## DO NOT EDIT BELOW THIS LINE ##
 
